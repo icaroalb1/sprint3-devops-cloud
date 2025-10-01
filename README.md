@@ -1,6 +1,12 @@
 # Sprint 3 - DevOps & Cloud
 ## Sistema de Gestão de Frota - Mottu API
 
+## Integrantes
+RM556270 - Bianca Vitoria - 2TDSPZ
+RM555166 - Guilherme Camargo - 2TDSPM
+RM555131 - Icaro Americo - 2TDSPM
+
+
 ### 1. Descrição da Solução
 
 Este projeto implementa uma **API REST completa** para gestão de frota de motos da Mottu, permitindo controle total sobre veículos e suas movimentações. A aplicação oferece:
