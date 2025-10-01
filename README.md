@@ -1,9 +1,26 @@
 # Sprint 3 - DevOps & Cloud ## Sistema de Gestão de Frota - Mottu API ### 
 
-1. Descrição da Solução Este projeto implementa uma **API REST completa** para gestão de frota de motos da Mottu, permitindo controle total sobre veículos e suas movimentações. A aplicação oferece: - **Gestão de Motos**: Cadastro, consulta, atualização e exclusão de motos - **Controle de Status**: Acompanhamento de disponibilidade, manutenção e localização - **Movimentações**: Registro de entrada/saída de veículos - **Gestão de Vagas**: Controle de ocupação de estacionamentos - **Localização**: Rastreamento GPS das motos em tempo real A solução utiliza **Spring Boot com Java 21** e **PostgreSQL** como banco de dados, garantindo alta performance, escalabilidade e confiabilidade para operações críticas da Mottu. ### 
+1. Descrição da Solução
+Este projeto implementa uma **API REST completa** para gestão de frota de motos da Mottu, permitindo controle total sobre veículos e suas movimentações.
+A aplicação oferece:
+ **Gestão de Motos**: Cadastro, consulta, atualização e exclusão de motos
+ **Controle de Status**: Acompanhamento de disponibilidade, manutenção e localização 
+ **Movimentações**: Registro de entrada/saída de veículos
+ **Gestão de Vagas**: Controle de ocupação de estacionamentos
+ **Localização**: Rastreamento GPS das motos em tempo real 
+ A solução utiliza **Spring Boot com Java 21** e **PostgreSQL** como banco de dados, garantindo alta performance, escalabilidade e confiabilidade para operações críticas da Mottu. ### 
 
-2. Benefícios para o Negócio A solução oferece os seguintes benefícios estratégicos para a Mottu: - **Controle Eficiente de Frota**: Visibilidade completa de todos os veículos e seu status - **Otimização de Recursos**: Gestão inteligente de vagas e movimentações - **Redução de Perdas**: Rastreamento GPS previne furtos e uso indevido - **Automação de Processos**: Elimina controles manuais e planilhas - **Escalabilidade**: Suporta crescimento da frota sem impacto na performance - **Disponibilidade 24/7**: Sistema sempre disponível na nuvem - **Auditoria Completa**: Histórico detalhado de todas as operações - **Integração**: API REST permite integração com outros sistemas da Mottu ### 3. Arquitetura da Solução
-3. 
+2. Benefícios para o Negócio A solução oferece os seguintes benefícios estratégicos para a Mottu: - 
+**Controle Eficiente de Frota**: Visibilidade completa de todos os veículos e seu status - 
+**Otimização de Recursos**: Gestão inteligente de vagas e movimentações -
+**Redução de Perdas**: Rastreamento GPS previne furtos e uso indevido - 
+**Automação de Processos**: Elimina controles manuais e planilhas -
+**Escalabilidade**: Suporta crescimento da frota sem impacto na performance - 
+**Disponibilidade 24/7**: Sistema sempre disponível na nuvem - 
+**Auditoria Completa**: Histórico detalhado de todas as operações - 
+**Integração**: API REST permite integração com outros sistemas da Mottu ### 
+
+3. Arquitetura da Solução
 ┌─────────────┐    ┌─────────────────────┐    ┌─────────────────────┐
 │   Usuário   │───▶│  Mottu API          │───▶│  PostgreSQL         │
 │   (Web/Mobile)│    │  (App Service)      │    │  (Azure Database)   │
