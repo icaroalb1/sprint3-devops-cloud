@@ -1,142 +1,132 @@
 # Sprint 3 - DevOps & Cloud
-## Sistema de Gestão de Motos
+## Sistema de Gestão de Frota - Mottu API
 
 ### 1. Descrição da Solução
 
-Este projeto implementa um sistema completo para cadastro e gestão de motos, permitindo realizar operações CRUD (Create, Read, Update, Delete) através de uma API REST. A aplicação permite:
+Este projeto implementa uma **API REST completa** para gestão de frota de motos da Mottu, permitindo controle total sobre veículos e suas movimentações. A aplicação oferece:
 
-- **Criar** novos registros de motos com modelo e placa
-- **Listar** todas as motos cadastradas
-- **Atualizar** informações de motos existentes
-- **Excluir** registros de motos do sistema
+- **Gestão de Motos**: Cadastro, consulta, atualização e exclusão de motos
+- **Controle de Status**: Acompanhamento de disponibilidade, manutenção e localização
+- **Movimentações**: Registro de entrada/saída de veículos
+- **Gestão de Vagas**: Controle de ocupação de estacionamentos
+- **Localização**: Rastreamento GPS das motos em tempo real
 
-A solução utiliza Spring Boot com Java 21 e PostgreSQL como banco de dados, garantindo alta performance e confiabilidade.
+A solução utiliza **Spring Boot com Java 21** e **PostgreSQL** como banco de dados, garantindo alta performance, escalabilidade e confiabilidade para operações críticas da Mottu.
 
 ### 2. Benefícios para o Negócio
 
-A solução oferece os seguintes benefícios estratégicos:
+A solução oferece os seguintes benefícios estratégicos para a Mottu:
 
-- **Digitalização completa**: Elimina planilhas manuais e processos baseados em papel
-- **Confiabilidade dos dados**: Sistema de banco de dados garante integridade e consistência
-- **Acessibilidade**: API REST permite integração com diferentes sistemas e aplicações
-- **Escalabilidade**: Arquitetura em nuvem permite crescimento conforme demanda
-- **Auditoria**: Controle completo de alterações e histórico de operações
-- **Disponibilidade**: Deploy em nuvem garante acesso 24/7
+- **Controle Eficiente de Frota**: Visibilidade completa de todos os veículos e seu status
+- **Otimização de Recursos**: Gestão inteligente de vagas e movimentações
+- **Redução de Perdas**: Rastreamento GPS previne furtos e uso indevido
+- **Automação de Processos**: Elimina controles manuais e planilhas
+- **Escalabilidade**: Suporta crescimento da frota sem impacto na performance
+- **Disponibilidade 24/7**: Sistema sempre disponível na nuvem
+- **Auditoria Completa**: Histórico detalhado de todas as operações
+- **Integração**: API REST permite integração com outros sistemas da Mottu
 
 ### 3. Arquitetura da Solução
 
 ```
 ┌─────────────┐    ┌─────────────────────┐    ┌─────────────────────┐
-│   Usuário   │───▶│  Aplicação Java     │───▶│  Banco PostgreSQL   │
-│             │    │  (App Service)      │    │  (PaaS Azure)       │
-│             │    │  Spring Boot        │    │  sprintdb           │
+│   Usuário   │───▶│  Mottu API          │───▶│  PostgreSQL         │
+│   (Web/Mobile)│    │  (App Service)      │    │  (Azure Database)   │
+│             │    │  Spring Boot + Java21│    │  mottudb            │
 └─────────────┘    └─────────────────────┘    └─────────────────────┘
 ```
 
 **Componentes:**
-- **Frontend/Cliente**: Interface para interação com a API
-- **Aplicação Java**: Spring Boot rodando no Azure App Service
+- **Frontend/Cliente**: Interface web ou mobile para operadores
+- **Mottu API**: Spring Boot rodando no Azure App Service
 - **Banco de Dados**: PostgreSQL hospedado no Azure Database for PostgreSQL
+- **Monitoramento**: Logs e métricas via Azure Monitor
 
 ### 4. Deploy no Azure (App Service + PostgreSQL via CLI)
 
-Execute os seguintes comandos Azure CLI para fazer o deploy completo da solução:
+Execute os scripts na ordem para fazer o deploy completo da solução:
 
 ```bash
 # 1. Criar grupo de recursos
-az group create --name sprint3-rg --location brazilsouth
+./azure-cli/01-create-resource-group.sh
 
 # 2. Criar servidor PostgreSQL
-az postgres flexible-server create \
-  --resource-group sprint3-rg \
-  --name sprint3-postgres \
-  --admin-user fiap \
-  --admin-password SenhaForte123! \
-  --location brazilsouth \
-  --public-access all
+./azure-cli/02-create-database.sh
 
-# 3. Criar banco dentro do servidor
-az postgres flexible-server db create \
-  --resource-group sprint3-rg \
-  --server-name sprint3-postgres \
-  --database-name sprintdb
+# 3. Criar App Service Plan e App Service
+./azure-cli/03-create-appservice.sh
 
-# 4. Criar plano do App Service
-az appservice plan create \
-  --name sprint3-plan \
-  --resource-group sprint3-rg \
-  --sku B1 \
-  --is-linux
+# 4. Configurar connection string
+./azure-cli/04-configure-connection.sh
 
-# 5. Criar WebApp Java 21
-az webapp create \
-  --resource-group sprint3-rg \
-  --plan sprint3-plan \
-  --name sprint3-javaapp \
-  --runtime "JAVA:21-java21"
-
-# 6. Configurar variáveis de ambiente
-az webapp config appsettings set \
-  --resource-group sprint3-rg \
-  --name sprint3-javaapp \
-  --settings \
-  DB_URL="jdbc:postgresql://sprint3-postgres.postgres.database.azure.com:5432/sprintdb" \
-  DB_USER="fiap" \
-  DB_PASS="SenhaForte123!"
-
-# 7. Deploy do .jar
-az webapp deploy \
-  --resource-group sprint3-rg \
-  --name sprint3-javaapp \
-  --type jar \
-  --src-path target/*.jar
+# 5. Deploy da aplicação
+./azure-cli/05-deploy-app.sh
 ```
 
-### 5. Testes CRUD
+### 5. Testes da API
 
-Após o deploy, utilize os seguintes exemplos para testar todas as operações:
+Após o deploy, utilize os exemplos JSON para testar todas as operações:
 
-#### **POST - Inserir Nova Moto**
+#### **POST - Criar Nova Moto**
 ```bash
-curl -X POST https://sprint3-javaapp.azurewebsites.net/motos \
+curl -X POST https://mottuapi-app.azurewebsites.net/motos \
   -H "Content-Type: application/json" \
-  -d '{
-    "modelo": "Honda Biz 125",
-    "placa": "DEF-9876"
-  }'
+  -d @tests/post-moto.json
 ```
 
 #### **GET - Listar Todas as Motos**
 ```bash
-curl -X GET https://sprint3-javaapp.azurewebsites.net/motos
+curl -X GET https://mottuapi-app.azurewebsites.net/motos
 ```
 
 #### **PUT - Atualizar Moto**
 ```bash
-curl -X PUT https://sprint3-javaapp.azurewebsites.net/motos/1 \
+curl -X PUT https://mottuapi-app.azurewebsites.net/motos/1 \
   -H "Content-Type: application/json" \
-  -d '{
-    "id": 1,
-    "modelo": "Honda Pop 110i - Atualizada",
-    "placa": "ABC-1234"
-  }'
+  -d @tests/put-moto.json
 ```
 
 #### **DELETE - Remover Moto**
 ```bash
-curl -X DELETE https://sprint3-javaapp.azurewebsites.net/motos/1
+curl -X DELETE https://mottuapi-app.azurewebsites.net/motos/1
 ```
 
-### 6. Link para o Código-Fonte
+### 6. Estrutura do Projeto
 
-👉 **Repositório do código Java**: https://github.com/icaroalb1/mottuapi
+```
+sprint3-devops-cloud/
+├── README.md                    # Documentação principal
+├── script_bd.sql               # DDL da tabela moto
+├── azure-cli/                  # Scripts de deploy Azure
+│   ├── 01-create-resource-group.sh
+│   ├── 02-create-database.sh
+│   ├── 03-create-appservice.sh
+│   ├── 04-configure-connection.sh
+│   └── 05-deploy-app.sh
+├── tests/                      # Exemplos de teste JSON
+│   ├── post-moto.json
+│   ├── put-moto.json
+│   └── delete-moto.json
+└── docs/                       # Documentação adicional
+    └── arquitetura.png
+```
 
-### 7. Passos para o Vídeo
+### 7. Links Importantes
+
+- **Repositório Java**: https://github.com/icaroalb1/mottuapi
+- **Repositório DevOps**: https://github.com/icaroalb1/sprint3-devops-cloud
+- **Vídeo Demonstrativo**: https://youtube.com/watch\?v\=SEU_VIDEO_ID_AQUI
+
+### 8. Diagrama de Arquitetura
+
+Consulte o arquivo `docs/arquitetura.png` para visualizar o diagrama completo da solução.
+
+### 9. Validação do Deploy
 
 **Checklist para demonstração:**
 
 - [ ] Clone do repositório `sprint3-devops-cloud`
-- [ ] Execução dos comandos Azure CLI para deploy
+- [ ] Execução dos scripts Azure CLI para deploy
 - [ ] Configuração do App Service + Banco PostgreSQL
 - [ ] Verificação da aplicação rodando no Azure
 - [ ] Demonstração de todas as operações CRUD funcionando
@@ -144,13 +134,12 @@ curl -X DELETE https://sprint3-javaapp.azurewebsites.net/motos/1
 - [ ] Teste de listagem via GET
 - [ ] Teste de atualização via PUT
 - [ ] Teste de exclusão via DELETE
-- [ ] Mostrar registros no banco via `psql` ou Azure Data Studio
 - [ ] Validação de logs da aplicação no Azure Portal
 
 **Comandos para verificar o banco:**
 ```bash
 # Conectar ao PostgreSQL
-psql "host=sprint3-postgres.postgres.database.azure.com port=5432 dbname=sprintdb user=fiap password=SenhaForte123! sslmode=require"
+psql "host=dbmottu.postgres.database.azure.com port=5432 dbname=mottudb user=mottuadmin password=SenhaForte123! sslmode=require"
 
 # Executar consultas
 SELECT * FROM moto;
